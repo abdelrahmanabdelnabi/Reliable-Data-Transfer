@@ -6,10 +6,6 @@ class Server extends Thread{
 
   var socket = new DatagramSocket(4445)
 
-  def server(name: String) {
-    socket = new DatagramSocket(4445)
-  }
-
   override def run(): Unit = {
     while(true) {
       val buf = new Array[Byte](256)
