@@ -1,3 +1,5 @@
+package sender
+
 import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
 class Sender(val address: InetAddress, val port: Int) {

@@ -1,3 +1,5 @@
+package sender
+
 import java.net.DatagramPacket
 
 class WaitForSendZero(context: Sender) extends State {

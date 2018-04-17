@@ -1,3 +1,5 @@
+package sender
+
 import java.net.DatagramPacket
 
 trait State {
