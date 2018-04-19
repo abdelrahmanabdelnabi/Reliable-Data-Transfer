@@ -1,7 +1,7 @@
 package sender
 
 import java.net.DatagramPacket
-class WaitForACKZero(context: Sender) extends State {
+class WaitForACK(seqNo: Int, context: Sender) extends State {
   override def timeout(seqNo: Int): Unit = {
 
   }
@@ -12,8 +12,8 @@ class WaitForACKZero(context: Sender) extends State {
   }
 
   override def RDTReceive(datagramPacket: DatagramPacket): Unit = {
-    val data = datagramPacket.getData
-    println("sender received ack: " + data.toString)
-    context.setCurrentState(new WaitForSendZero(context))
+    val receviedSeqNo = PacketBuilder.extractSeqNo(datagramPacket)
+    println("sender received ack: " + receviedSeqNo)
+    context.setCurrentState(new WaitForSend(1-seqNo, context))
   }
 }

@@ -2,15 +2,20 @@ package sender
 
 import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
-class Sender(val address: InetAddress, val port: Int) {
 
-  var currentState: State = new WaitForSendZero(this)
-  val myAdd = InetAddress.getByName("localhost")
-  val myPort = 4440
+class Sender(address: InetAddress, port: Int) {
+
+  var currentState: State = new WaitForSend(0,this)
   val UDPSocket: DatagramSocket = new DatagramSocket()
+  var fileName = ""
 
   val notifier = new AckNotifier(UDPSocket, this)
   notifier.start()
+
+  def this(address: InetAddress, port: Int, fileName: String) {
+    this(address, port)
+    this.fileName = fileName
+  }
 
   class AckNotifier(socket: DatagramSocket, listener: Sender) extends Thread {
 
@@ -41,4 +46,18 @@ class Sender(val address: InetAddress, val port: Int) {
     new DatagramPacket(data, data.length, address, port)
   }
 
+  def makePacket(data: Array[Byte], seqNo: Int): DatagramPacket = {
+    PacketBuilder.buildDataPacket(data, seqNo, 0)
+  }
+
+  def isAvailable(): Boolean = {
+    if(currentState.isInstanceOf[WaitForSend])
+      true
+    else
+      false
+  }
+
+
+
 }
+
