@@ -1,6 +1,6 @@
 import java.net.{DatagramPacket, DatagramSocket}
 
-import receiver.StopAndWaitReceiver
+import receiver.StopAndWaitReceiver.StopAndWaitReceiver
 import sender.StopAndWaitSender.StopAndWaitSender
 
 object Main {

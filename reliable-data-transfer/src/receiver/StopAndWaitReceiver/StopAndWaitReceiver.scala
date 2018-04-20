@@ -1,7 +1,8 @@
-package receiver
+package receiver.StopAndWaitReceiver
 
 import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
+import receiver.State
 import sender.PacketBuilder
 
 class StopAndWaitReceiver(var address: InetAddress, var port: Int) extends Thread{

@@ -1,11 +1,11 @@
-package receiver
+package receiver.StopAndWaitReceiver
+
 import java.net.{DatagramPacket, DatagramSocket}
 
+import receiver.State
 import sender.PacketBuilder
 
-import scala.util.Random
-
-class WaitForPacket(context: StopAndWaitReceiver) extends State {
+private class WaitForPacket(context: StopAndWaitReceiver) extends State {
   var socket = new DatagramSocket()
   var seqNo = 0
 

@@ -1,6 +1,6 @@
 import java.net.InetAddress
 
-import receiver.StopAndWaitReceiver
+import receiver.StopAndWaitReceiver.StopAndWaitReceiver
 
 
 object Main {
