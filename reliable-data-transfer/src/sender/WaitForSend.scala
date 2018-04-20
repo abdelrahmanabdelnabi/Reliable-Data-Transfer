@@ -4,8 +4,8 @@ import java.net.{DatagramPacket, InetAddress}
 
 class WaitForSend(seqNo: Int, context: Sender) extends State {
   override def timeout(seqNo: Int): Unit = {
-    throw new IllegalStateException("received timeout signal but was not expecting an acknowledgment")
-
+    // we should do nothing here. If the sender it waiting for a call from above, this means
+    // that any packets sent before, if any, are already acknowledged
   }
 
   override def RDTSend(data: Array[Byte]): Boolean = {

@@ -5,7 +5,6 @@ class WaitForACK(seqNo: Int, context: Sender) extends State {
   override def timeout(seqNo: Int): Unit = {
     println("packet " + seqNo + " timed out. resending")
     context.UDPSocket.send(context.makePacket(context.currentData, seqNo))
-    context.setCurrentState(new WaitForACK(seqNo, context))
     context.timer.start(seqNo)
   }
 
