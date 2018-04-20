@@ -13,7 +13,7 @@ object PacketBuilder {
   }
 
   def buildDataPacket(data: Array[Byte], seqNo: Int, checkSum: Int): DatagramPacket = {
-    val byteBuffer: ByteBuffer = ByteBuffer.allocate(1024)
+    val byteBuffer: ByteBuffer = ByteBuffer.allocate(data.length + 4 + 4)
     byteBuffer.putInt(seqNo)
     byteBuffer.putInt(checkSum)
     byteBuffer.put(data)
@@ -23,13 +23,9 @@ object PacketBuilder {
   }
 
   def buildACKPacket(seqNo: Int, checkSum: Int): DatagramPacket = {
-    val byteBuffer: ByteBuffer = ByteBuffer.allocate(1024)
-    byteBuffer.putInt(seqNo)
-    byteBuffer.putInt(checkSum)
-    byteBuffer.put("ACK".getBytes)
-    val allData = byteBuffer.array()
+    val data = "ACK".getBytes()
 
-    new DatagramPacket(allData, allData.length)
+    buildDataPacket(data, seqNo, checkSum)
   }
 
   def buildACKPacket(seqNo: Int, checkSum: Int, address: InetAddress, port: Int): DatagramPacket = {
@@ -40,28 +36,31 @@ object PacketBuilder {
   }
 
   def extractData(datagramPacket: DatagramPacket): Array[Byte] = {
-    val byteBuffer = ByteBuffer.allocate(1024)
+    val byteBuffer = ByteBuffer.allocate(datagramPacket.getData.length)
+    val dataLength = datagramPacket.getLength - 8 // 4 bytes checksum, 4 bytes seqNo
 
     byteBuffer.put(datagramPacket.getData)
-    val data: Array[Byte] = new Array[Byte](1024)
-    byteBuffer.get(data, 8, 1024-8)
+    byteBuffer.position(8)
+    val data: Array[Byte] = new Array[Byte](dataLength)
+    byteBuffer.get(data, 0, dataLength)
     data
   }
 
   def extractSeqNo(datagramPacket: DatagramPacket): Int  = {
-    val buffer: Array[Byte] = datagramPacket.getData
-
-    val byteBuffer = ByteBuffer.allocate(1024)
-    byteBuffer.put(buffer)
-    byteBuffer.getInt(0)
+    extractIntAtOffset(datagramPacket, 0)
   }
 
   def extractCheckSum(datagramPacket: DatagramPacket): Int = {
-    val buffer: Array[Byte] = datagramPacket.getData
+    extractIntAtOffset(datagramPacket, 4)
+  }
 
-    val byteBuffer = ByteBuffer.allocate(1024)
-    byteBuffer.put(buffer)
-    byteBuffer.getInt(4)
+  private def extractIntAtOffset(datagramPacket: DatagramPacket, offset: Int): Int = {
+    val data: Array[Byte] = datagramPacket.getData
+
+    val byteBuffer = ByteBuffer.allocate(data.length)
+    byteBuffer.put(data)
+    byteBuffer.position(offset)
+    byteBuffer.getInt()
   }
 
 }

@@ -4,10 +4,13 @@ import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
 
 class Sender(address: InetAddress, port: Int) {
+  val lock: Object = new Object
 
   var currentState: State = new WaitForSend(0,this)
   val UDPSocket: DatagramSocket = new DatagramSocket()
   var fileName = ""
+  val timer: MyTimer = new MyTimer(this, 10)
+  var currentData: Array[Byte] = _
 
   val notifier = new AckNotifier(UDPSocket, this)
   notifier.start()
@@ -31,33 +34,45 @@ class Sender(address: InetAddress, port: Int) {
   }
 
   def send(data: Array[Byte]): Boolean = {
-    currentState.RDTSend(data)
+    lock.synchronized{
+      currentData = data
+      currentState.RDTSend(data)
+    }
   }
 
   def receive(packet: DatagramPacket): Unit = {
-    currentState.RDTReceive(packet)
+    lock.synchronized {
+      currentState.RDTReceive(packet)
+    }
+  }
+
+  def timeout(seqNo: Int): Unit = {
+    lock.synchronized{
+      currentState.timeout(seqNo)
+    }
   }
 
   def setCurrentState(nextState: State): Unit = {
-    currentState = nextState
-  }
-
-  def makePacket(data: Array[Byte]): DatagramPacket = {
-    new DatagramPacket(data, data.length, address, port)
+    lock.synchronized{
+      currentState = nextState
+    }
   }
 
   def makePacket(data: Array[Byte], seqNo: Int): DatagramPacket = {
-    PacketBuilder.buildDataPacket(data, seqNo, 0)
+    val packet = PacketBuilder.buildDataPacket(data, seqNo, 0)
+    packet.setAddress(address)
+    packet.setPort(port)
+    packet
   }
 
   def isAvailable(): Boolean = {
-    if(currentState.isInstanceOf[WaitForSend])
-      true
-    else
-      false
+    lock.synchronized{
+      if(currentState.isInstanceOf[WaitForSend])
+        true
+      else
+        false
+    }
   }
-
-
 
 }
 

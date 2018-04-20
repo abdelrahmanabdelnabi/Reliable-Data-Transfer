@@ -1,13 +1,12 @@
 import java.net.InetAddress
 import java.nio.file.{Files, Path, Paths}
+import java.net.DatagramSocket
+import java.net.DatagramPacket
 
 import sender.Sender
 
 class SingleRequestServer(address: InetAddress, port: Int, fileName: String) extends Thread {
 
-  import java.net.DatagramSocket
-  import java.net.DatagramPacket
-  import java.net.InetAddress
 
   var socket = new DatagramSocket()
 
@@ -27,24 +26,24 @@ class SingleRequestServer(address: InetAddress, port: Int, fileName: String) ext
 
     // open requested file and convert it to byte array
     val path: Path = Paths.get(System.getProperty("user.dir"), fileName)
-    println(path)
     val data = Files.readAllBytes(path)
 
     // create a sender object
     val sender = new Sender(address, port)
 
-    println("created sender object and will now send")
     // Send 100 bytes at a time
-    for(group <- data.grouped(100).toArray) {
+    var packetNo = 0
+    for(group <- data.grouped(1).toArray) {
       // wait until sender is available
       synchronized {
 
         while(!sender.isAvailable()){
-          print(".")
+          Thread.sleep(1)
         }
         println()
       }
-      println("sending 100 bytes")
+      println("sending packet " + packetNo)
+      packetNo += 1
 
       sender.send(group)
     }

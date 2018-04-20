@@ -38,12 +38,9 @@ class Receiver(var address: InetAddress, var port: Int) extends Thread{
   def receive(): Unit = {
 
     while(true) {
-      val buf = new Array[Byte](256)
+      val buf = new Array[Byte](1040)
       val rec_packet = new DatagramPacket(buf, buf.length)
       socket.receive(rec_packet)
-      var data: String = new String(rec_packet.getData)
-      data = data.substring(0, data.indexOf(0))
-      println("received " + data + " from port " + rec_packet.getPort)
       currentState.RDTReceive(rec_packet)
     }
   }
