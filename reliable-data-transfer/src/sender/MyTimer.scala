@@ -3,6 +3,8 @@ package sender
 import java.util.TimerTask
 import java.util.Timer
 
+import sender.StopAndWaitSender.StopAndWaitSender
+
 class MyTimer(listener: Sender, timeOut: Int) {
   private var timerZero: Timer = _
   private var timerOne: Timer = _

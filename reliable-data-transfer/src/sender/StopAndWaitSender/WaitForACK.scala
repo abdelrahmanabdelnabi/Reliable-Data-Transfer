@@ -1,11 +1,15 @@
-package sender
+package sender.StopAndWaitSender
 
 import java.net.DatagramPacket
-class WaitForACK(seqNo: Int, context: Sender) extends State {
+
+import sender.{PacketBuilder, Sender, State}
+
+private class WaitForACK(seqNo: Int, context: Sender) extends State {
+
   override def timeout(seqNo: Int): Unit = {
     println("packet " + seqNo + " timed out. resending")
-    context.UDPSocket.send(context.makePacket(context.currentData, seqNo))
-    context.timer.start(seqNo)
+    context.getSocket.send(context.getPacket(seqNo))
+    context.startTimer(seqNo)
   }
 
   override def RDTSend(data: Array[Byte]): Boolean = {
@@ -19,9 +23,11 @@ class WaitForACK(seqNo: Int, context: Sender) extends State {
     val corrupted = PacketBuilder.isCorrupted(datagramPacket)
     if(PacketBuilder.extractSeqNo(datagramPacket) == seqNo && !corrupted) {
       val receivedSeqNo = PacketBuilder.extractSeqNo(datagramPacket)
-      context.timer.cancel(seqNo)
+      context.stopTimer(seqNo)
       println("received ACK: " + receivedSeqNo)
       context.setCurrentState(new WaitForSend(1-seqNo, context))
+      context.base = 1-seqNo
+      context.nextSequenceNumber = 1-context.nextSequenceNumber
     } else if(corrupted) {
       println("received a corrupted ACK")
     } else {

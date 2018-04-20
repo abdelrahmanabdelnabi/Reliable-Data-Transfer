@@ -4,7 +4,7 @@ import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
 import sender.PacketBuilder
 
-class Receiver(var address: InetAddress, var port: Int) extends Thread{
+class StopAndWaitReceiver(var address: InetAddress, var port: Int) extends Thread{
 
   var socket = new DatagramSocket()
   var currentState: State = new WaitForPacket(this)

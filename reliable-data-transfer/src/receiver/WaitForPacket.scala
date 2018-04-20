@@ -5,7 +5,7 @@ import sender.PacketBuilder
 
 import scala.util.Random
 
-class WaitForPacket(context: Receiver) extends State {
+class WaitForPacket(context: StopAndWaitReceiver) extends State {
   var socket = new DatagramSocket()
   var seqNo = 0
 
