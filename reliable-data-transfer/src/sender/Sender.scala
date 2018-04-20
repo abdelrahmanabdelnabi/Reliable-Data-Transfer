@@ -5,6 +5,7 @@ import java.net.{DatagramPacket, DatagramSocket}
 trait Sender {
   var base: Int = 0
   var nextSequenceNumber: Int = 0
+  var windowSize = 1
 
   def getSocket: DatagramSocket
 
