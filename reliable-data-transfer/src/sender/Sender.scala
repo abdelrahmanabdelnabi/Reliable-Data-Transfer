@@ -59,7 +59,7 @@ class Sender(address: InetAddress, port: Int) {
   }
 
   def makePacket(data: Array[Byte], seqNo: Int): DatagramPacket = {
-    val packet = PacketBuilder.buildDataPacket(data, seqNo, 0)
+    val packet = PacketBuilder.buildDataPacket(data, seqNo)
     packet.setAddress(address)
     packet.setPort(port)
     packet

@@ -27,7 +27,7 @@ class Receiver(var address: InetAddress, var port: Int) extends Thread{
 
     val ack = "ACK".getBytes()
 
-    val ackPacket = PacketBuilder.buildACKPacket(0, 0, address, port)
+    val ackPacket = PacketBuilder.buildACKPacket(0, address, port)
     socket.send(ackPacket)
 
     // now connection is setup

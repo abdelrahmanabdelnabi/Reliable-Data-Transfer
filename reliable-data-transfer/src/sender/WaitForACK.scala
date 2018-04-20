@@ -9,20 +9,23 @@ class WaitForACK(seqNo: Int, context: Sender) extends State {
   }
 
   override def RDTSend(data: Array[Byte]): Boolean = {
-    throw new IllegalStateException()
+    throw new IllegalStateException("Can not send when waiting for ACK")
     false
   }
 
   override def RDTReceive(datagramPacket: DatagramPacket): Unit = {
 
     // if packet is not corrupted and with correct sequence number
-    if(PacketBuilder.extractSeqNo(datagramPacket) == seqNo) {
+    val corrupted = PacketBuilder.isCorrupted(datagramPacket)
+    if(PacketBuilder.extractSeqNo(datagramPacket) == seqNo && !corrupted) {
       val receivedSeqNo = PacketBuilder.extractSeqNo(datagramPacket)
       context.timer.cancel(seqNo)
       println("received ACK: " + receivedSeqNo)
       context.setCurrentState(new WaitForSend(1-seqNo, context))
+    } else if(corrupted) {
+      println("received a corrupted ACK")
     } else {
-      println("received a delayed ACK")
+      println("received a delayed or duplicate ACK")
     }
   }
 }

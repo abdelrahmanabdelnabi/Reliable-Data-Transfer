@@ -33,12 +33,11 @@ class SingleRequestServer(address: InetAddress, port: Int, fileName: String) ext
 
     // Send 100 bytes at a time
     var packetNo = 0
-    for(group <- data.grouped(1).toArray) {
+    for(group <- data.grouped(256).toArray) {
       // wait until sender is available
       synchronized {
 
         while(!sender.isAvailable()){
-          Thread.sleep(1)
         }
         println()
       }
@@ -50,6 +49,5 @@ class SingleRequestServer(address: InetAddress, port: Int, fileName: String) ext
 
     println("finished sending file")
   }
-
 
 }
