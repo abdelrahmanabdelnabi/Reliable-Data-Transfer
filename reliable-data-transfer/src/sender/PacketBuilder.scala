@@ -76,6 +76,21 @@ object PacketBuilder {
     checksum.getValue
   }
 
+  def corruptPacketData(packet: DatagramPacket): DatagramPacket = {
+    val byteBuffer = ByteBuffer.allocate(packet.getData.length)
+    val dataLength = packet.getLength - 12 // 8 bytes checksum, 4 bytes seqNo
+    val seqNo = extractSeqNo(packet)
+    val checkSum = extractCheckSum(packet)
+    val shuffledData: Array[Byte] = util.Random.shuffle(extractData(packet).toList).toArray
+
+    byteBuffer.putInt(seqNo)
+    byteBuffer.putLong(checkSum)
+    byteBuffer.put(shuffledData)
+
+    val newPacketData = byteBuffer.array()
+    new DatagramPacket(newPacketData, newPacketData.length, packet.getAddress, packet.getPort)
+  }
+
   def isCorrupted(datagramPacket: DatagramPacket): Boolean = {
     val rawData = extractData(datagramPacket)
     val checkSum = extractCheckSum(datagramPacket)
@@ -86,5 +101,6 @@ object PacketBuilder {
       return false
     true
   }
+
 
 }

@@ -3,13 +3,13 @@ import java.nio.file.{Files, Path, Paths}
 import java.net.DatagramSocket
 import java.net.DatagramPacket
 
+import sender.GBNSender.GBNSender
 import sender.StopAndWaitSender.StopAndWaitSender
+import sockets.UnreliableSocket
 
 class SingleRequestServer(address: InetAddress, port: Int, fileName: String) extends Thread {
 
-
   var socket = new DatagramSocket()
-
 
   override def run(): Unit = {
     // send empty connection setup packet
@@ -29,21 +29,19 @@ class SingleRequestServer(address: InetAddress, port: Int, fileName: String) ext
     val data = Files.readAllBytes(path)
 
     // create a sender object
-    val sender = new StopAndWaitSender(address, port)
+    val sender = new GBNSender(address, port, 4,
+      new UnreliableSocket(0,0))
 
-    // Send 100 bytes at a time
+    // Send a group of bytes at a time
     var packetNo = 1
     for(group <- data.grouped(10).toArray) {
       // wait until sender is available
       synchronized {
-
-        while(!sender.isAvailable){
-        }
-        println()
+        while(!sender.isAvailable){}
       }
+
       println("sending packet " + packetNo)
       packetNo += 1
-
       sender.send(group)
     }
 

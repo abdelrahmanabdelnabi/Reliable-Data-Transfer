@@ -3,18 +3,23 @@ package sender.GBNSender
 import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
 import sender.{MyTimer, PacketBuilder, Sender, State}
+import sockets.UnreliableSocket
 import window.{GBNSenderWindow, Window}
 
 class GBNSender(address: InetAddress, port: Int, windowSize: Int, socket: DatagramSocket) extends Sender {
+
   val lock: Object = new Object
   var window: Window = new GBNSenderWindow(windowSize)
-
   var currentState: State = new Wait(this)
-  val UDPSocket: DatagramSocket = socket
-  val timer: MyTimer = new MyTimer(this, 100)
+  var UDPSocket: DatagramSocket = socket
+  val timer: MyTimer = new MyTimer(this, 30)
 
   val notifier = new AckNotifier(UDPSocket, this)
   notifier.start()
+
+  def this(address: InetAddress, port: Int, windowSize: Int) = {
+    this(address, port, windowSize, new UnreliableSocket(0, 0))
+  }
 
   class AckNotifier(socket: DatagramSocket, listener: GBNSender) extends Thread {
 
