@@ -1,5 +1,6 @@
 import java.net.InetAddress
 
+import receiver.GBNReceiver.GBNReceiver
 import receiver.StopAndWaitReceiver.StopAndWaitReceiver
 
 

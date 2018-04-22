@@ -2,10 +2,13 @@ package sender
 
 import java.net.{DatagramPacket, DatagramSocket}
 
+import window.Window
+
 trait Sender {
-  var base: Int = 0
-  var nextSequenceNumber: Int = 0
-  var windowSize = 1
+
+  var base: Int
+  var nextSequenceNumber: Int
+  var window: Window
 
   def getSocket: DatagramSocket
 

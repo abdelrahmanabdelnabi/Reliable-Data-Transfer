@@ -1,15 +1,14 @@
-package receiver.StopAndWaitReceiver
+package receiver.GBNReceiver
 
 import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
-import receiver.State
+import receiver.{Receiver, State}
 import sender.PacketBuilder
 
-class StopAndWaitReceiver(var address: InetAddress, var port: Int) extends Thread {
-
+class GBNReceiver(var address: InetAddress, var port: Int) extends Thread with Receiver  {
   var socket = new DatagramSocket()
-  var currentState: State = new WaitForPacket(this)
-  var expectedSeqNo = 0
+  var currentState: State = new Wait(this)
+  expectedSeqNo = 1
 
   override def run(): Unit = {
     // TODO: handle timeout and corruption in connection setup
@@ -42,5 +41,13 @@ class StopAndWaitReceiver(var address: InetAddress, var port: Int) extends Threa
       socket.receive(rec_packet)
       currentState.RDTReceive(rec_packet)
     }
+  }
+
+  override def getSocket: DatagramSocket = {
+    socket
+  }
+
+  override def setCurrentState(nextState: State): Unit = {
+    currentState = nextState
   }
 }

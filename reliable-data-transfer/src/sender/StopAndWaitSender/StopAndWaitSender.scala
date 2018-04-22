@@ -3,10 +3,15 @@ package sender.StopAndWaitSender
 import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
 import sender._
+import window.{GBNSenderWindow, Window}
 
 
 class StopAndWaitSender(address: InetAddress, port: Int) extends Sender {
   val lock: Object = new Object
+  var window: Window = new GBNSenderWindow(1)
+
+  var base = 0
+  var nextSequenceNumber = 0
 
   var currentState: State = new WaitForSend(0,this)
   val UDPSocket: DatagramSocket = new DatagramSocket()

@@ -3,6 +3,7 @@ import java.nio.file.{Files, Path, Paths}
 import java.net.DatagramSocket
 import java.net.DatagramPacket
 
+import sender.GBNSender.GBNSender
 import sender.StopAndWaitSender.StopAndWaitSender
 
 class SingleRequestServer(address: InetAddress, port: Int, fileName: String) extends Thread {
@@ -32,8 +33,8 @@ class SingleRequestServer(address: InetAddress, port: Int, fileName: String) ext
     val sender = new StopAndWaitSender(address, port)
 
     // Send 100 bytes at a time
-    var packetNo = 0
-    for(group <- data.grouped(256).toArray) {
+    var packetNo = 1
+    for(group <- data.grouped(10).toArray) {
       // wait until sender is available
       synchronized {
 
