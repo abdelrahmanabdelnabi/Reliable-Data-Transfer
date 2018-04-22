@@ -16,14 +16,14 @@ private class Wait(context: Sender) extends State {
     println("packet timed-out, resending packets " + from + " to " + to)
 
     for(seqNo <- context.window.getBase until context.window.getNextSequenceNumber) {
-      val packet = context.getPacket(seqNo)
+      val packet = context.window.getPacket(seqNo)
       context.getSocket.send(packet)
     }
 
   }
 
   override def RDTSend(data: Array[Byte]): Boolean = {
-    val sendPacket = context.getPacket(context.window.getNextSequenceNumber - 1)
+    val sendPacket = context.window.getPacket(context.window.getNextSequenceNumber - 1)
     context.getSocket.send(sendPacket)
 
     if(context.window.getBase == context.window.getNextSequenceNumber - 1)

@@ -1,8 +1,5 @@
 import java.net.{DatagramPacket, DatagramSocket}
 
-import receiver.StopAndWaitReceiver.StopAndWaitReceiver
-import sender.StopAndWaitSender.StopAndWaitSender
-
 object Main {
 
   def main(args: Array[String]): Unit = {

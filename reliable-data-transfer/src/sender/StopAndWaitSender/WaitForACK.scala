@@ -8,7 +8,7 @@ private class WaitForACK(seqNo: Int, context: Sender) extends State {
 
   override def timeout(seqNo: Int): Unit = {
     println("packet " + seqNo + " timed out. resending")
-    context.getSocket.send(context.getPacket(seqNo))
+    context.getSocket.send(context.window.getPacket(seqNo))
     context.startTimer(seqNo)
   }
 
@@ -26,8 +26,7 @@ private class WaitForACK(seqNo: Int, context: Sender) extends State {
       context.stopTimer(seqNo)
       println("received ACK: " + receivedSeqNo)
       context.setCurrentState(new WaitForSend(1-seqNo, context))
-      context.base = 1-seqNo
-      context.nextSequenceNumber = 1-context.nextSequenceNumber
+      context.window.acknowledge(seqNo)
     } else if(corrupted) {
       println("received a corrupted ACK")
     } else {

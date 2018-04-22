@@ -84,13 +84,6 @@ class GBNSender(address: InetAddress, port: Int, windowSize: Int, socket: Datagr
     UDPSocket
   }
 
-  override def getPacket(seqNo: Int): DatagramPacket = {
-//    if(seqNo >= base && seqNo < nextSequenceNumber)
-      window.getPacket(seqNo)
-//    else
-//      throw new IllegalArgumentException
-  }
-
   override def startTimer(seqNo: Int): Unit = {
     timer.start(seqNo)
   }
@@ -98,7 +91,4 @@ class GBNSender(address: InetAddress, port: Int, windowSize: Int, socket: Datagr
   override def stopTimer(seqNo: Int): Unit = {
     timer.cancel(seqNo)
   }
-
-  override var base: Int = _
-  override var nextSequenceNumber: Int = _
 }

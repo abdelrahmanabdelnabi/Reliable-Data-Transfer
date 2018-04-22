@@ -3,21 +3,17 @@ package sender.StopAndWaitSender
 import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
 import sender._
-import window.{GBNSenderWindow, Window}
+import window.{StopAndWaitWindow, Window}
 
 
 class StopAndWaitSender(address: InetAddress, port: Int) extends Sender {
   val lock: Object = new Object
-  var window: Window = new GBNSenderWindow(1)
-
-  var base = 0
-  var nextSequenceNumber = 0
+  var window: Window = new StopAndWaitWindow()
 
   var currentState: State = new WaitForSend(0,this)
   val UDPSocket: DatagramSocket = new DatagramSocket()
   var fileName = ""
   val timer: MyTimer = new MyTimer(this, 10)
-  var currentPacket: DatagramPacket = _
 
   val notifier = new AckNotifier(UDPSocket, this)
   notifier.start()
@@ -42,7 +38,7 @@ class StopAndWaitSender(address: InetAddress, port: Int) extends Sender {
 
   override  def send(data: Array[Byte]): Unit = {
     lock.synchronized{
-      currentPacket = makePacket(data, base)
+      window.append(makePacket(data, window.getBase))
       currentState.RDTSend(data)
     }
   }
@@ -85,13 +81,6 @@ class StopAndWaitSender(address: InetAddress, port: Int) extends Sender {
     UDPSocket
   }
 
-  override def getPacket(seqNo: Int): DatagramPacket = {
-    if(seqNo == base)
-      currentPacket
-    else
-      throw new IllegalArgumentException
-  }
-
   override def startTimer(seqNo: Int): Unit = {
     timer.start(seqNo)
   }
@@ -100,4 +89,3 @@ class StopAndWaitSender(address: InetAddress, port: Int) extends Sender {
     timer.cancel(seqNo)
   }
 }
-

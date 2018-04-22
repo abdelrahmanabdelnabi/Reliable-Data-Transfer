@@ -6,13 +6,9 @@ import window.Window
 
 trait Sender {
 
-  var base: Int
-  var nextSequenceNumber: Int
   var window: Window
 
   def getSocket: DatagramSocket
-
-  def getPacket(seqNo: Int): DatagramPacket
 
   def makePacket(data: Array[Byte], seqNo: Int): DatagramPacket
 

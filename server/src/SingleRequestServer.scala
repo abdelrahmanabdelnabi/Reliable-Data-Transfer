@@ -3,7 +3,6 @@ import java.nio.file.{Files, Path, Paths}
 import java.net.DatagramSocket
 import java.net.DatagramPacket
 
-import sender.GBNSender.GBNSender
 import sender.StopAndWaitSender.StopAndWaitSender
 
 class SingleRequestServer(address: InetAddress, port: Int, fileName: String) extends Thread {

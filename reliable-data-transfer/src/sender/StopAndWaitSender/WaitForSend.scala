@@ -13,7 +13,7 @@ private class WaitForSend(seqNo: Int, context: Sender) extends State {
 
   override def RDTSend(data: Array[Byte]): Boolean = {
     context.setCurrentState(new WaitForACK(seqNo, context))
-    context.getSocket.send(context.getPacket(seqNo))
+    context.getSocket.send(context.window.getPacket(seqNo))
     context.startTimer(seqNo)
     true
   }
