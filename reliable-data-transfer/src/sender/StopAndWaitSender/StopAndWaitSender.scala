@@ -15,7 +15,7 @@ class StopAndWaitSender(address: InetAddress, port: Int) extends Sender {
   var fileName = ""
   val timer: MyTimer = new MyTimer(this, 10)
 
-  val notifier = new AckNotifier(UDPSocket, this)
+  val notifier = new ACKNotifier(UDPSocket, this)
   notifier.start()
 
   def this(address: InetAddress, port: Int, fileName: String) {
@@ -23,18 +23,6 @@ class StopAndWaitSender(address: InetAddress, port: Int) extends Sender {
     this.fileName = fileName
   }
 
-  class AckNotifier(socket: DatagramSocket, listener: StopAndWaitSender) extends Thread {
-
-    override def run(): Unit = {
-      println("listening for ACKs")
-      while(true) {
-        val buf = new Array[Byte](256)
-        val rec_packet = new DatagramPacket(buf, buf.length)
-        socket.receive(rec_packet)
-        listener.receive(rec_packet)
-      }
-    }
-  }
 
   override  def send(data: Array[Byte]): Unit = {
     lock.synchronized{
@@ -43,7 +31,7 @@ class StopAndWaitSender(address: InetAddress, port: Int) extends Sender {
     }
   }
 
-  private def receive(packet: DatagramPacket): Unit = {
+  override def receive(packet: DatagramPacket): Unit = {
     lock.synchronized {
       currentState.RDTReceive(packet)
     }

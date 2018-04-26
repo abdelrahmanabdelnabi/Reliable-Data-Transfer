@@ -2,7 +2,7 @@ package sender.GBNSender
 
 import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
-import sender.{MyTimer, PacketBuilder, Sender, State}
+import sender._
 import sockets.UnreliableSocket
 import window.{GBNSenderWindow, Window}
 
@@ -14,33 +14,15 @@ class GBNSender(address: InetAddress, port: Int, windowSize: Int, socket: Datagr
   var UDPSocket: DatagramSocket = socket
   val timer: MyTimer = new MyTimer(this, 30)
 
-  val notifier = new AckNotifier(UDPSocket, this)
+  val notifier = new ACKNotifier(UDPSocket, this)
   notifier.start()
 
   def this(address: InetAddress, port: Int, windowSize: Int) = {
     this(address, port, windowSize, new UnreliableSocket(0, 0))
   }
 
-  class AckNotifier(socket: DatagramSocket, listener: GBNSender) extends Thread {
-
-    override def run(): Unit = {
-      println("listening for ACKs")
-      while(true) {
-        val buf = new Array[Byte](256)
-        val rec_packet = new DatagramPacket(buf, buf.length)
-        socket.receive(rec_packet)
-        listener.receive(rec_packet)
-      }
-    }
-  }
-
   override  def send(data: Array[Byte]): Unit = {
     lock.synchronized {
-      // TODO:
-      // check if there is space available in window
-      // then put data in window and call RDTSend
-      // else refuse the data
-
       if(window.hasSpace) {
         window.append(makePacket(data, window.getNextSequenceNumber))
         currentState.RDTSend(data)
@@ -51,7 +33,7 @@ class GBNSender(address: InetAddress, port: Int, windowSize: Int, socket: Datagr
     }
   }
 
-  private def receive(packet: DatagramPacket): Unit = {
+  override def receive(packet: DatagramPacket): Unit = {
     lock.synchronized {
       currentState.RDTReceive(packet)
     }
