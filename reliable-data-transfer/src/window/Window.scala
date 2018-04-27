@@ -5,12 +5,7 @@ import java.util
 
 trait Window {
 
-  val packets: java.util.LinkedList[DatagramPacket] = new util.LinkedList[DatagramPacket]()
-  val isAcked: java.util.LinkedList[Boolean] = new util.LinkedList[Boolean]()
-
-  def hasSpace: Boolean = {
-    getWindowSize - packets.size > 0
-  }
+  def hasSpace: Boolean
 
   def append(packet: DatagramPacket): Unit
 

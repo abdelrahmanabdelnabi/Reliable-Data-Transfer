@@ -9,7 +9,7 @@ class StopAndWaitWindow extends Window {
   var currentPacket: DatagramPacket = _
 
   override def append(packet: DatagramPacket): Unit = {
-    if(currentPacket == null)
+    if(hasSpace)
       currentPacket = packet
     else
       throw new IllegalStateException("Window has no space available")
@@ -40,4 +40,6 @@ class StopAndWaitWindow extends Window {
   override def getNextSequenceNumber: Int = nextSeqNum
 
   override def getWindowSize: Int = window
+
+  override def hasSpace: Boolean = currentPacket == null
 }

@@ -3,21 +3,7 @@ package window
 import java.net.DatagramPacket
 import java.util
 
-class GBNSenderWindow(windowLength: Int) extends Window {
-  private var base: Int = 1
-  private var nextSequenceNumber: Int = 1
-  private val windowSize: Int = windowLength
-
-
-  override def append(packet: DatagramPacket): Unit = {
-    if(hasSpace) {
-      packets.add(packet)
-      isAcked.add(false)
-      nextSequenceNumber += 1
-    } else {
-      throw new Exception("No space available")
-    }
-  }
+class GBNSenderWindow(val windowSize: Int) extends AbstractPipelinedWindow {
 
   override def acknowledge(seqNo: Int): java.util.List[DatagramPacket] = {
     if(seqNo-base > packets.size())
@@ -37,14 +23,6 @@ class GBNSenderWindow(windowLength: Int) extends Window {
 
     delivered
   }
-
-  override def getPacket(seqNo: Int): DatagramPacket = {
-    packets.get(seqNo-base)
-  }
-
-  override def getBase: Int = base
-
-  override def getNextSequenceNumber: Int = nextSequenceNumber
 
   override def getWindowSize: Int = windowSize
 }
