@@ -1,20 +1,23 @@
 package sender.SRSender
 
-import java.net.{DatagramPacket, DatagramSocket}
+import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
 import sender.{ACKNotifier, MyTimer, Sender, State}
 import sockets.UnreliableSocket
-import window.Window
+import window.{SRSenderWindow, Window}
 
-class SRSender extends Sender {
+class SRSender(address: InetAddress, port: Int, windowSize: Int, socket: DatagramSocket) extends Sender {
 
-  override var window: Window = _
-  val socket: DatagramSocket = new UnreliableSocket(0,0)
+  var window: Window = new SRSenderWindow(windowSize)
   var currentState: State = _
   val timer: MyTimer = new MyTimer(this, 30)
   val lock: Object = new Object
   val notifier:  ACKNotifier = new ACKNotifier(socket, this)
   notifier.start()
+
+  def this(address: InetAddress, port: Int, windowSize: Int) = {
+    this(address, port, windowSize, new UnreliableSocket(0, 0))
+  }
 
   override def send(data: Array[Byte]): Unit = {
     lock.synchronized {
