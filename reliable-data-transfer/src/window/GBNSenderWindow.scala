@@ -25,4 +25,14 @@ class GBNSenderWindow(val windowSize: Int) extends AbstractPipelinedWindow {
   }
 
   override def getWindowSize: Int = windowSize
+
+  /**
+    * puts a packet at the specified location.
+    *
+    * @param packet the packet to be put in the window
+    * @param seqNo  the sequence number of the location of the packet.
+    *               Must be a valid sequence number.
+    */
+  override def putPacket(packet: DatagramPacket, seqNo: Int): Unit =
+    throw new UnsupportedOperationException("window does not support packet buffering")
 }
