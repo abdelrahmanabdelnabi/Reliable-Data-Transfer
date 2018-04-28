@@ -2,7 +2,7 @@ package sender.SRSender
 
 import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
-import sender.{ACKNotifier, MyTimer, Sender, State}
+import sender._
 import sockets.UnreliableSocket
 import window.{SRSenderWindow, Window}
 
@@ -21,20 +21,32 @@ class SRSender(address: InetAddress, port: Int, windowSize: Int, socket: Datagra
 
   override def send(data: Array[Byte]): Unit = {
     lock.synchronized {
-      // TODO: Implement me
+      if(window.hasSpace){
+        window.append(makePacket(data, window.getNextSequenceNumber))
+        currentState.RDTSend(data)
+      } else{
+        println("Window has no free space")
+      }
     }
   }
 
   override def timeout(seqNo: Int): Unit = {
     lock.synchronized {
-      // TODO: Implement me
+      currentState.timeout(seqNo)
     }
   }
 
   override def receive(packet: DatagramPacket): Unit = {
     lock.synchronized {
-      // TODO: Implement me
+      currentState.RDTReceive(packet)
     }
+  }
+
+  def makePacket(data: Array[Byte], seqNo: Int): DatagramPacket = {
+    val packet = PacketBuilder.buildDataPacket(data, seqNo)
+    packet.setAddress(address)
+    packet.setPort(port)
+    packet
   }
 
   override def getSocket: DatagramSocket = socket
