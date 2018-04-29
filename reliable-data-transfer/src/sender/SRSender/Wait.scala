@@ -34,8 +34,7 @@ class Wait(context: Sender) extends State {
     val corrupted = PacketBuilder.isCorrupted(datagramPacket)
 
     if(!corrupted){
-      print("received ACK " + seqNo + " base: " + context.window.getBase
-        + " nextSeqNo: " + context.window.getNextSequenceNumber)
+      println("received ACK " + seqNo )
 
       context.window.acknowledge(seqNo)
       context.stopTimer(seqNo)

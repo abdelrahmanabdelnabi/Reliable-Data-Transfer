@@ -56,7 +56,7 @@ class StopAndWaitSender(address: InetAddress, port: Int) extends Sender {
     packet
   }
 
-  def isAvailable: Boolean = {
+  override def isAvailable: Boolean = {
     lock.synchronized{
       if(currentState.isInstanceOf[WaitForSend])
         true

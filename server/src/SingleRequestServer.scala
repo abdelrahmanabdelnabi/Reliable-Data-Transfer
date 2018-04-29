@@ -4,6 +4,8 @@ import java.net.DatagramSocket
 import java.net.DatagramPacket
 
 import sender.GBNSender.GBNSender
+import sender.SRSender.SRSender
+import sender.Sender
 import sender.StopAndWaitSender.StopAndWaitSender
 import sockets.UnreliableSocket
 
@@ -29,7 +31,7 @@ class SingleRequestServer(address: InetAddress, port: Int, fileName: String) ext
     val data = Files.readAllBytes(path)
 
     // create a sender object
-    val sender = new GBNSender(address, port, 4,
+    val sender: Sender = new SRSender(address, port, 4,
       new UnreliableSocket(0,0))
 
     // Send a group of bytes at a time

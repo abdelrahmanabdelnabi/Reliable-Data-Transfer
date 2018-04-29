@@ -4,12 +4,13 @@ import java.net.{DatagramPacket, DatagramSocket, InetAddress}
 
 import receiver.{Receiver, State}
 import sender.PacketBuilder
-import window.Window
+import window.{SRReceiverWindow, Window}
 
-class SRReceiver(var address: InetAddress, var port: Int) extends Thread with Receiver {
+class SRReceiver(var address: InetAddress, var port: Int, val windowSize: Int)
+  extends Thread with Receiver {
   var socket = new DatagramSocket()
   var currentState: State = new Wait(this)
-  val window: Window = null
+  val window: Window = new SRReceiverWindow(windowSize)
 
   override def run(): Unit = {
     // TODO: handle timeout and corruption in connection setup

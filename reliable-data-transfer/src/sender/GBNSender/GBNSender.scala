@@ -58,7 +58,7 @@ class GBNSender(address: InetAddress, port: Int, windowSize: Int, socket: Datagr
     packet
   }
 
-  def isAvailable: Boolean = {
+  override def isAvailable: Boolean = {
     lock.synchronized{
       if(window.hasSpace)
         true

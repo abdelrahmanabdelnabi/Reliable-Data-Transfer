@@ -60,4 +60,10 @@ trait Sender {
     */
   def receive(packet: DatagramPacket): Unit
 
+  /**
+    * returns true if the sender has space available in its window to send data.
+    * @return true if the sender can send data.
+    */
+  def isAvailable: Boolean
+
 }

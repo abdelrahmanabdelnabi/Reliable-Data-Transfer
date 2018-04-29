@@ -9,7 +9,7 @@ import window.{SRSenderWindow, Window}
 class SRSender(address: InetAddress, port: Int, windowSize: Int, socket: DatagramSocket) extends Sender {
 
   var window: Window = new SRSenderWindow(windowSize)
-  var currentState: State = _
+  var currentState: State = new Wait(this)
   val timer: MyTimer = new MyTimer(this, 30)
   val lock: Object = new Object
   val notifier:  ACKNotifier = new ACKNotifier(socket, this)
@@ -56,4 +56,18 @@ class SRSender(address: InetAddress, port: Int, windowSize: Int, socket: Datagra
   override def stopTimer(seqNo: Int): Unit = timer.cancel(seqNo)
 
   override def setCurrentState(nextState: State): Unit = currentState = nextState
+
+  /**
+    * returns true if the sender has space available in its window to send data.
+    *
+    * @return true if the sender can send data.
+    */
+  override def isAvailable: Boolean = {
+    lock.synchronized {
+    if (window.hasSpace)
+      true
+    else
+      false
+    }
+  }
 }
